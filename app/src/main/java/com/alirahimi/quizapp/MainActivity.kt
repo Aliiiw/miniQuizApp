@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import com.alirahimi.quizapp.utils.Constants
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Name can't be Empty!!", Toast.LENGTH_LONG).show()
             } else {
                 Intent(this, QuizQuestionActivity::class.java).also {
+                    intent.putExtra(Constants.USER_NAME, userName.text.toString())
                     startActivity(it)
                     finish()
                 }

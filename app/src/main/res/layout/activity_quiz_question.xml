@@ -52,7 +52,7 @@
                 android:max="10"
                 android:minHeight="50dp"
                 android:progress="0"
-                android:progressTint="@color/green" />
+                android:progressTint="@android:color/holo_green_light" />
 
             <TextView
                 android:id="@+id/tvProgress"

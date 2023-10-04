@@ -1,8 +1,10 @@
 package com.alirahimi.quizapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.AdaptiveIconDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -30,6 +32,9 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
     private var currentPosition = 1
     private var mQuestionList: ArrayList<Question>? = null
     private var mSelectedOption: Int = 0
+    private var mUserName: String? = null
+    private var mCorrectAnswers: Int = 0
+
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +53,7 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
         tvOption3 = findViewById(R.id.tvOption3)
         tvOption4 = findViewById(R.id.tvOption4)
         btnSubmit = findViewById(R.id.btnSubmit)
+        mUserName = intent.getStringExtra(Constants.USER_NAME)
 
         tvOption1?.setOnClickListener(this)
         tvOption2?.setOnClickListener(this)
@@ -62,6 +68,8 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
 
     @SuppressLint("SetTextI18n")
     private fun setQuestion() {
+        defaultOptionsView()
+
         val question = mQuestionList?.get(currentPosition - 1)
         progressBar?.progress = currentPosition
         tvProgress?.text = "$currentPosition / ${progressBar?.max}"
@@ -75,7 +83,7 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
         if (currentPosition == mQuestionList!!.size) {
             btnSubmit?.text = "Finish"
         } else {
-            btnSubmit?.text = "Continue"
+            btnSubmit?.text = "Submit"
         }
     }
 
@@ -139,9 +147,62 @@ class QuizQuestionActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             R.id.btnSubmit -> {
-                btnSubmit?.let {
+                if (mSelectedOption == 0) {
+                    currentPosition++
+
+                    when {
+                        currentPosition <= mQuestionList!!.size -> {
+                            setQuestion()
+                        }
+
+                        else -> {
+                            Intent(this, ResultActivity::class.java).also {
+                                it.putExtra(Constants.USER_NAME, mUserName)
+                                it.putExtra(Constants.CORRECT_ANSWERS, mCorrectAnswers)
+                                it.putExtra(Constants.TOTAL_QUESTIONS, mQuestionList?.size)
+                                startActivity(it)
+                                finish()
+                            }
+                        }
+                    }
+                } else {
+                    val question = mQuestionList?.get(currentPosition - 1)
+
+                    if (question!!.correctAnswer != mSelectedOption) {
+                        answerView(mSelectedOption, R.drawable.wrong_option_border_bg)
+                    } else {
+                        mCorrectAnswers++
+                    }
+                    answerView(question.correctAnswer, R.drawable.correct_option_border_bg)
+
+                    if (currentPosition == mQuestionList!!.size) {
+                        btnSubmit?.text = "Finish"
+                    } else {
+                        btnSubmit?.text = "Go to next Question"
+                    }
+                    mSelectedOption = 0
 
                 }
+            }
+        }
+    }
+
+    private fun answerView(answer: Int, drawableView: Int) {
+        when (answer) {
+            1 -> {
+                tvOption1?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+
+            2 -> {
+                tvOption2?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+
+            3 -> {
+                tvOption3?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+
+            4 -> {
+                tvOption4?.background = ContextCompat.getDrawable(this, drawableView)
             }
         }
     }
